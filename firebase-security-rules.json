@@ -1,0 +1,116 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid == $uid || root.child('admins').child(auth.uid).exists())",
+        ".write": "auth != null && (auth.uid == $uid || root.child('admins').child(auth.uid).exists())",
+        "realMoney": {
+          ".write": "root.child('admins').child(auth.uid).exists()",
+          ".read": "auth != null && auth.uid == $uid"
+        },
+        "wallet": {
+          ".write": "root.child('admins').child(auth.uid).exists()",
+          ".read": "auth != null && auth.uid == $uid"
+        },
+        "coins": { ".write": "root.child('admins').child(auth.uid).exists()" },
+        "isBanned": { ".write": "root.child('admins').child(auth.uid).exists()" },
+        "isFrozen": { ".write": "root.child('admins').child(auth.uid).exists()" },
+        "stats": { ".write": "root.child('admins').child(auth.uid).exists()" },
+        "totalWinnings": { ".write": "root.child('admins').child(auth.uid).exists()" },
+        "totalKills": { ".write": "root.child('admins').child(auth.uid).exists()" },
+        "transactions": {
+          ".read": "auth != null && auth.uid == $uid",
+          ".write": "root.child('admins').child(auth.uid).exists()"
+        },
+        "notifications": {
+          ".read": "auth != null && auth.uid == $uid",
+          ".write": "auth != null",
+          "$notif": {
+            ".write": "auth != null && (auth.uid == $uid || root.child('admins').child(auth.uid).exists())"
+          }
+        },
+        "ageVerified": { ".write": "auth != null && auth.uid == $uid" },
+        "dateOfBirth": { ".write": "auth != null && auth.uid == $uid" },
+        "ageVerifiedAt": { ".write": "auth != null && auth.uid == $uid" },
+        "tcAccepted": { ".write": "auth != null && auth.uid == $uid" },
+        "tcAcceptedAt": { ".write": "auth != null && auth.uid == $uid" },
+        "tcVersion": { ".write": "auth != null && auth.uid == $uid" },
+        "selfExcluded": { ".write": "auth != null && auth.uid == $uid" },
+        "selfExcludedTill": { ".write": "auth != null && auth.uid == $uid" },
+        "tds": {
+          ".read": "auth != null && (auth.uid == $uid || root.child('admins').child(auth.uid).exists())",
+          ".write": "auth != null && auth.uid == $uid",
+          "tdsDeducted": { ".write": "auth != null && auth.uid == $uid" }
+        },
+        "kyc": {
+          ".read": "auth != null && (auth.uid == $uid || root.child('admins').child(auth.uid).exists())",
+          ".write": "auth != null && (auth.uid == $uid || root.child('admins').child(auth.uid).exists())",
+          "status": { ".write": "root.child('admins').child(auth.uid).exists()" },
+          "verifiedAt": { ".write": "root.child('admins').child(auth.uid).exists()" }
+        },
+        "ign": { ".write": "auth != null && auth.uid == $uid" },
+        "fcmToken": { ".write": "auth != null && auth.uid == $uid" },
+        "lastSeen": { ".write": "auth != null && auth.uid == $uid" },
+        "onlineStatus": { ".write": "auth != null && auth.uid == $uid" }
+      }
+    },
+    "kycRequests": {
+      ".read": "root.child('admins').child(auth.uid).exists()",
+      "$uid": {
+        ".read": "auth != null && (auth.uid == $uid || root.child('admins').child(auth.uid).exists())",
+        ".write": "auth != null && (auth.uid == $uid || root.child('admins').child(auth.uid).exists())",
+        "status": { ".write": "root.child('admins').child(auth.uid).exists()" }
+      }
+    },
+    "disputes": {
+      ".read": "root.child('admins').child(auth.uid).exists()",
+      "$disputeId": {
+        ".read": "auth != null",
+        ".write": "auth != null && (!data.exists() || root.child('admins').child(auth.uid).exists())",
+        "status": { ".write": "root.child('admins').child(auth.uid).exists()" }
+      }
+    },
+    "tdsRecords": {
+      ".read": "root.child('admins').child(auth.uid).exists()",
+      ".write": "auth != null"
+    },
+    "tdsHeld": {
+      ".read": "root.child('admins').child(auth.uid).exists()",
+      ".write": "auth != null",
+      "$id": {
+        "depositedToGovt": { ".write": "root.child('admins').child(auth.uid).exists()" }
+      }
+    },
+    "walletRequests": {
+      ".read": "root.child('admins').child(auth.uid).exists()",
+      "$req": {
+        ".write": "auth != null && (!data.exists() && newData.child('status').val() == 'pending' && (newData.child('uid').val() == auth.uid || newData.child('userId').val() == auth.uid)) || root.child('admins').child(auth.uid).exists()",
+        ".read": "auth != null && (data.child('uid').val() == auth.uid || root.child('admins').child(auth.uid).exists())",
+        "status": { ".write": "root.child('admins').child(auth.uid).exists()" }
+      }
+    },
+    "joinRequests": {
+      "$req": {
+        ".read": "auth != null",
+        ".write": "auth != null && (!data.exists() || root.child('admins').child(auth.uid).exists())",
+        "adminVerified": { ".write": "root.child('admins').child(auth.uid).exists()" },
+        "slotNumber": { ".write": "root.child('admins').child(auth.uid).exists()" }
+      }
+    },
+    "matches": { ".read": "auth != null", ".write": "root.child('admins').child(auth.uid).exists()" },
+    "tournaments": { ".read": "auth != null", ".write": "root.child('admins').child(auth.uid).exists()" },
+    "results": { ".read": "auth != null", ".write": "root.child('admins').child(auth.uid).exists()" },
+    "matchResults": { ".read": "root.child('admins').child(auth.uid).exists()", ".write": "root.child('admins').child(auth.uid).exists()" },
+    "walletAuditLog": { ".read": "root.child('admins').child(auth.uid).exists()", ".write": "root.child('admins').child(auth.uid).exists()" },
+    "activityLogs": { ".read": "root.child('admins').child(auth.uid).exists()", ".write": "root.child('admins').child(auth.uid).exists()" },
+    "adminAlerts": { ".read": "root.child('admins').child(auth.uid).exists()", ".write": "auth != null" },
+    "adminActivityLog": { ".read": "root.child('admins').child(auth.uid).exists()", ".write": "root.child('admins').child(auth.uid).exists()" },
+    "admins": { ".read": "root.child('admins').child(auth.uid).exists()", ".write": "root.child('admins').child(auth.uid).exists()" },
+    "appSettings": { ".read": "auth != null", ".write": "root.child('admins').child(auth.uid).exists()" },
+    "announcements": { ".read": "auth != null", ".write": "root.child('admins').child(auth.uid).exists()" },
+    "notifications": { ".read": "root.child('admins').child(auth.uid).exists()", ".write": "root.child('admins').child(auth.uid).exists()" },
+    "utrIndex": { ".read": "root.child('admins').child(auth.uid).exists()", ".write": "root.child('admins').child(auth.uid).exists()" },
+    "suspiciousActivity": { ".read": "root.child('admins').child(auth.uid).exists()", ".write": "root.child('admins').child(auth.uid).exists()" },
+    "$other": { ".read": "root.child('admins').child(auth.uid).exists()", ".write": "root.child('admins').child(auth.uid).exists()" }
+  }
+}
