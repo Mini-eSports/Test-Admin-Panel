@@ -459,21 +459,6 @@ th,td{padding:6px 8px}
 </head>
 <body>
 
-<!-- LOGIN -->
-<div class="login-screen" id="loginScreen">
-<div class="login-card">
-<div class="login-icon"><i class="fas fa-gamepad"></i></div>
-<div class="login-title">MINI ESPORT</div>
-<div class="login-subtitle">Admin Control Center</div>
-<div class="login-error" id="loginError"><i class="fas fa-exclamation-circle"></i> <span id="loginErrorMsg"></span></div>
-<form id="loginForm" onsubmit="handleLogin(event)">
-<div class="form-group"><input type="email" id="loginEmail" class="form-input" placeholder="Admin Email" required></div>
-<div class="form-group"><input type="password" id="loginPassword" class="form-input" placeholder="Password" required></div>
-<button type="submit" class="btn btn-primary w-full" id="loginBtn" style="padding:11px;font-size:13px"><i class="fas fa-shield-halved"></i> Access Admin Panel</button>
-</form>
-</div>
-</div>
-
 <!-- LOADING -->
 <div class="loading-screen" id="loadingScreen" style="display:none">
 <div class="spinner"></div>
@@ -1376,7 +1361,7 @@ th,td{padding:6px 8px}
 /* =============================================
    FIREBASE CONFIG
    ============================================= */
-const firebaseConfig={apiKey:"AIzaSyA-v9AYigDrg96D_fos0vOW3wU2GY2UYec",authDomain:"fft-app-1e283.firebaseapp.com",databaseURL:"https://fft-app-1e283-default-rtdb.firebaseio.com",projectId:"fft-app-1e283",storageBucket:"fft-app-1e283.appspot.com",messagingSenderId:"247829466483",appId:"1:247829466483:web:6961488f1d3c4e3fff4906"};
+const firebaseConfig={apiKey:"AIzaSyCc0VeTIfwYqOTfKEt3IfiKHvxNkgZnkPQ",authDomain:"ff-tournament-app-93105.firebaseapp.com",databaseURL:"https://ff-tournament-app-93105-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"ff-tournament-app-93105",storageBucket:"ff-tournament-app-93105.firebasestorage.app",messagingSenderId:"486362918198",appId:"1:486362918198:web:ce5bd047fb584636bd5797"};
 var _adminApp = firebase.initializeApp(firebaseConfig, "adminPanel");
 var auth=_adminApp.auth(),rtdb=_adminApp.database(),db=_adminApp.firestore();
 
@@ -1482,48 +1467,28 @@ async function markReferralUsed(uid){
 /* =============================================
    AUTH
    ============================================= */
+/* Login screen removed on request — panel opens directly.
+   Silent anonymous sign-in keeps auth.currentUser populated so all the
+   existing admin-action logging (auth.currentUser.uid/.email) keeps working. */
 auth.onAuthStateChanged(async function(u){
-  console.log('Auth:',u?u.email:'null');
+  console.log('Auth:',u?u.uid:'null');
   if(u){
     try{
-      /* Check Firestore admins collection first, then RTDB as fallback */
-      var isAdmin=false;
-      try{
-        var fsSnap=await db.collection('admins').doc(u.uid).get();
-        if(fsSnap.exists)isAdmin=true;
-      }catch(fsErr){console.log('Firestore check failed, trying RTDB:',fsErr.message);}
-      if(!isAdmin){
-        try{
-          var rtSnap=await rtdb.ref('admins/'+u.uid).once('value');
-          if(rtSnap.exists())isAdmin=true;
-        }catch(rtErr){console.log('RTDB check failed:',rtErr.message);}
-      }
-      /* Last resort: check by email for known admin emails */
-      if(!isAdmin&&(u.email==='admin@fft.com'||u.email==='admin@fftapp.com')){
-        isAdmin=true;
-        console.log('Admin verified by email whitelist');
-      }
-      if(isAdmin){
-        document.getElementById('loginScreen').style.display='none';
-        document.getElementById('loadingScreen').style.display='flex';
-        document.getElementById('adminEmail').textContent=u.email;
-        await initializeAdminPanel();
-        document.getElementById('loadingScreen').style.display='none';
-        document.getElementById('mainApp').style.display='block';
-        setTimeout(function(){document.getElementById('mainApp').classList.add('show')},50);
-      }else{showLoginError('Access denied: Not an admin account.');auth.signOut();}
-    }catch(e){showLoginError('Login error: '+e.message);auth.signOut();}
+      document.getElementById('loadingScreen').style.display='flex';
+      document.getElementById('adminEmail').textContent='Admin';
+      await initializeAdminPanel();
+      document.getElementById('loadingScreen').style.display='none';
+      document.getElementById('mainApp').style.display='block';
+      setTimeout(function(){document.getElementById('mainApp').classList.add('show')},50);
+    }catch(e){console.log('Init error:',e.message);}
   }else{
-    document.getElementById('loginScreen').style.display='flex';
-    document.getElementById('loadingScreen').style.display='none';
+    document.getElementById('loadingScreen').style.display='flex';
     document.getElementById('mainApp').style.display='none';
     document.getElementById('mainApp').classList.remove('show');
+    auth.signInAnonymously().catch(function(er){console.log('Silent sign-in failed:',er.message);});
   }
 });
-function handleLogin(e){e.preventDefault();const em=document.getElementById('loginEmail').value,pw=document.getElementById('loginPassword').value,btn=document.getElementById('loginBtn');btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Authenticating...';hideLoginError();auth.signInWithEmailAndPassword(em,pw).catch(function(er){showLoginError(er.message);btn.disabled=false;btn.innerHTML='<i class="fas fa-shield-halved"></i> Access Admin Panel';});}
-function showLoginError(m){document.getElementById('loginErrorMsg').textContent=m;document.getElementById('loginError').classList.add('show');}
-function hideLoginError(){document.getElementById('loginError').classList.remove('show');}
-function logoutAdmin(){if(confirm('Logout?'))auth.signOut();}
+function logoutAdmin(){if(confirm('Reload panel?'))location.reload();}
 
 /* =============================================
    INIT
